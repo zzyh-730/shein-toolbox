@@ -1,0 +1,16 @@
+# 旧版分离文件，已合并到希音工具箱.html
+profit-calculator.html
+listing-generator.html
+data-analyzer.html
+competitor-monitor.html
+使用指南.html
+index.html
+
+# WiFi修复脚本不属于演示
+修复WiFi卡顿.bat
+修复WiFi.ps1
+
+# 系统文件
+__pycache__/
+*.pyc
+.DS_Store

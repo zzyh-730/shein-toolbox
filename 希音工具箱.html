@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>希音运营工具箱 | 30天3万净利润</title>
+<style>
+  :root {
+    --bg: #0f0f0f; --card: #1a1a1a; --border: #2a2a2a;
+    --text: #e0e0e0; --text-secondary: #888;
+    --accent: #00d4aa; --danger: #ff4d6a; --warning: #ffa940;
+    --accent2: #ff4da6; --input-bg: #141414;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height:1.6; min-height:100vh;
+  }
+
+  /* ===== Top Tab Bar ===== */
+  .tab-bar {
+    position: sticky; top:0; z-index:100;
+    background: var(--bg); border-bottom:1px solid var(--border);
+    display:flex; overflow-x:auto; padding:8px 12px; gap:4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    flex-shrink:0; padding:8px 16px; border-radius:8px; font-size:13px;
+    cursor:pointer; font-family:inherit; font-weight:500;
+    background:transparent; border:1px solid transparent;
+    color:var(--text-secondary); transition:all 0.2s; white-space:nowrap;
+  }
+  .tab-btn:hover { color:var(--text); background:var(--input-bg); }
+  .tab-btn.active {
+    background:rgba(0,212,170,0.1); border-color:var(--accent); color:var(--accent);
+  }
+  .tab-badge {
+    display:inline-block; width:7px; height:7px; border-radius:50%; margin-left:4px;
+  }
+  .tab-badge.green { background:var(--accent); }
+
+  /* ===== Panels ===== */
+  .tab-panel { display:none; padding:20px 16px 60px; max-width:860px; margin:0 auto; }
+  .tab-panel.active { display:block; }
+
+  .panel-title { text-align:center; padding:16px 0 20px; }
+  .panel-title h2 { font-size:22px; font-weight:700; }
+  .panel-title h2 span { color:var(--accent); }
+  .panel-title .sub { color:var(--text-secondary); font-size:13px; margin-top:4px; }
+
+  /* ===== Shared Cards ===== */
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:20px; margin-bottom:14px;
+  }
+  .card-title {
+    font-size:15px; font-weight:600; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media(max-width:500px){ .form-row { grid-template-columns:1fr; } }
+  .form-group { display:flex; flex-direction:column; gap:4px; }
+  .form-group label { font-size:12px; color:var(--text-secondary); }
+  .form-group input,.form-group select,.form-group textarea {
+    background:var(--input-bg); border:1px solid var(--border);
+    border-radius:8px; padding:10px 12px; color:var(--text);
+    font-size:14px; font-family:inherit; width:100%;
+  }
+  .form-group textarea { resize:vertical; }
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus {
+    outline:none; border-color:var(--accent);
+  }
+  select { cursor:pointer; }
+
+  .btn {
+    background:var(--accent); color:#000; border:none;
+    padding:10px 20px; border-radius:8px; font-size:14px;
+    font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s;
+  }
+  .btn:hover { opacity:0.85; }
+  .btn-sm {
+    padding:5px 12px; font-size:12px; border-radius:6px;
+    background:var(--input-bg); border:1px solid var(--border);
+    color:var(--text-secondary); cursor:pointer; font-family:inherit;
+  }
+  .btn-sm:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-danger {
+    background:var(--danger); color:#fff; border:none;
+    padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer; font-family:inherit;
+  }
+  .btn-outline {
+    background:transparent; border:1px solid var(--accent); color:var(--accent);
+  }
+
+  .input-suffix { position:relative; }
+  .input-suffix input { padding-right:32px; }
+  .input-suffix .suffix {
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-secondary); font-size:13px; pointer-events:none;
+  }
+
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  @media(max-width:600px){ .kpi-grid { grid-template-columns:1fr 1fr; } }
+  .kpi-item {
+    background:var(--input-bg); border-radius:10px; padding:16px; text-align:center;
+  }
+  .kpi-item .label { font-size:11px; color:var(--text-secondary); margin-bottom:4px; }
+  .kpi-item .value { font-size:22px; font-weight:700; }
+  .kpi-item .sub { font-size:11px; color:var(--text-secondary); margin-top:2px; }
+
+  .profit-positive { color:var(--accent); }
+  .profit-negative { color:var(--danger); }
+  .profit-neutral { color:var(--warning); }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); }
+  th { color:var(--text-secondary); font-weight:500; font-size:12px; }
+
+  .tag {
+    display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600;
+    margin:2px 4px 2px 0;
+  }
+
+  .presets { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .preset-btn {
+    background:var(--input-bg); border:1px solid var(--border); color:var(--text-secondary);
+    padding:6px 14px; border-radius:20px; font-size:13px;
+    cursor:pointer; font-family:inherit; transition:all 0.2s;
+  }
+  .preset-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .preset-btn.active { background:rgba(0,212,170,0.1); border-color:var(--accent); color:var(--accent); }
+
+  .output-box {
+    background:var(--input-bg); border:1px solid var(--border);
+    border-radius:8px; padding:14px; font-size:14px; line-height:1.7;
+    white-space:pre-wrap; word-break:break-word; min-height:50px;
+  }
+  .output-label {
+    font-size:12px; color:var(--text-secondary); margin-bottom:6px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+
+  .bar-wrap { background:var(--border); border-radius:4px; height:8px; margin-top:4px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:4px; background:var(--accent2); transition:width 0.5s; }
+
+  .goal-tracker { background:linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,212,170,0.02)); border:1px solid rgba(0,212,170,0.2); }
+  .goal-progress { display:flex; align-items:center; gap:16px; margin:12px 0; }
+  .goal-circle {
+    width:90px; height:90px; border-radius:50%; flex-shrink:0;
+    background:conic-gradient(var(--accent) var(--progress, 0%), var(--input-bg) var(--progress, 0%));
+    display:flex; align-items:center; justify-content:center;
+  }
+  .goal-circle-inner {
+    width:70px; height:70px; border-radius:50%; background:var(--card);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .goal-circle-inner .pct { font-size:16px; font-weight:700; }
+  .goal-circle-inner .lbl { font-size:11px; color:var(--text-secondary); }
+  .goal-info { flex:1; }
+  .goal-info .row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .goal-info .row:last-child { border-bottom:none; }
+  .highlight { color:var(--accent); font-weight:600; }
+
+  input[type="range"] {
+    -webkit-appearance:none; width:100%; height:6px; border-radius:3px; background:var(--border); outline:none; margin:10px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--accent); cursor:pointer;
+  }
+
+  .score-a { color:var(--accent); font-weight:700; }
+  .score-b { color:var(--warning); font-weight:700; }
+  .score-c { color:var(--danger); font-weight:700; }
+
+  .table-wrap { max-height:400px; overflow-y:auto; border-radius:8px; }
+
+  .toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#000; padding:8px 20px;
+    border-radius:20px; font-size:13px; font-weight:600;
+    opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:1000;
+  }
+  .toast.show { opacity:1; }
+
+  .tips { font-size:13px; color:var(--text-secondary); line-height:1.8; }
+
+  @media (max-width:640px) {
+    .tab-btn { padding:6px 12px; font-size:12px; }
+    .panel-title h2 { font-size:20px; }
+    .goal-progress { flex-direction:column; text-align:center; }
+    .goal-info { width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Tab Bar -->
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-panel="calc">💰 利润计算</button>
+  <button class="tab-btn" data-panel="listing">📝 Listing生成</button>
+  <button class="tab-btn" data-panel="data">📊 数据分析</button>
+  <button class="tab-btn" data-panel="competitor">🔍 竞品监控</button>
+  <button class="tab-btn" data-panel="price">💲 核价技巧</button>
+  <button class="tab-btn" data-panel="guide">📖 使用指南</button>
+</nav>
+
+<!-- ==================== 面板1: 利润计算器 ==================== -->
+<div class="tab-panel active" id="panel-calc">
+<div class="panel-title"><h2>利润<span>计算器</span></h2><p class="sub">每单赚多少 → 一天出几单 → 多久能达标</p></div>
+
+<div class="card">
+  <div class="card-title">📊 成本与售价</div>
+  <div class="presets" id="calcPresets">
+    <button class="preset-btn active" data-cat="clothing">👗 女装</button>
+    <button class="preset-btn" data-cat="accessories">💍 配饰</button>
+    <button class="preset-btn" data-cat="home">🏠 家居</button>
+    <button class="preset-btn" data-cat="shoes">👟 鞋类</button>
+    <button class="preset-btn" data-cat="bag">👜 箱包</button>
+    <button class="preset-btn" data-cat="custom">✏️ 自定义</button>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>采购成本（元/件）</label><div class="input-suffix"><input type="number" id="c_productCost" value="30" step="0.01"><span class="suffix">¥</span></div></div>
+    <div class="form-group"><label>国内运费（元/件）</label><div class="input-suffix"><input type="number" id="c_domesticShipping" value="3" step="0.01"><span class="suffix">¥</span></div></div>
+    <div class="form-group"><label>头程物流（元/件）</label><div class="input-suffix"><input type="number" id="c_intlLogistics" value="8" step="0.01"><span class="suffix">¥</span></div></div>
+    <div class="form-group"><label>平台佣金率（%）</label><div class="input-suffix"><input type="number" id="c_commissionRate" value="12" step="0.1"><span class="suffix">%</span></div></div>
+    <div class="form-group"><label>广告费（元/件）</label><div class="input-suffix"><input type="number" id="c_adCost" value="5" step="0.01"><span class="suffix">¥</span></div></div>
+    <div class="form-group"><label>打包/耗材/其他（元/件）</label><div class="input-suffix"><input type="number" id="c_otherCost" value="2" step="0.01"><span class="suffix">¥</span></div></div>
+  </div>
+  <div style="margin-top:16px; max-width:320px;">
+    <div class="form-group"><label>🇺🇸 售价·美元</label><div class="input-suffix"><input type="number" id="c_priceUSD" value="12.99" step="0.01"><span class="suffix">$</span></div></div>
+    <div style="margin-top:6px; font-size:13px; color:var(--text-secondary);">
+      汇率：<input type="number" id="c_exchangeRate" value="7.25" step="0.01" style="width:70px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; color:var(--text); padding:2px 6px; font-size:13px;"> ¥/$ → 人民币 ≈ <strong id="c_priceCNY">94.18</strong> 元
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">💰 单件利润</div>
+  <div class="kpi-grid">
+    <div class="kpi-item"><div class="label">总成本</div><div class="value" id="c_totalCost">—</div></div>
+    <div class="kpi-item"><div class="label">净利润</div><div class="value" id="c_netProfit">—</div></div>
+    <div class="kpi-item"><div class="label">利润率</div><div class="value" id="c_profitMargin">—</div></div>
+    <div class="kpi-item"><div class="label">保本售价$</div><div class="value" id="c_breakEven" style="font-size:18px;">—</div></div>
+  </div>
+</div>
+
+<div class="card goal-tracker">
+  <div class="card-title">🎯 3万净利润目标追踪</div>
+  <div style="margin-bottom:10px;">
+    <label style="font-size:13px; color:var(--text-secondary);">日均销量（单）</label>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <input type="range" id="c_dailyOrders" min="0" max="200" value="10">
+      <span id="c_dailyOrdersLabel" style="font-weight:700; font-size:16px; min-width:50px;">10 单</span>
+    </div>
+  </div>
+  <div class="goal-progress">
+    <div class="goal-circle" id="c_goalCircle">
+      <div class="goal-circle-inner"><div class="pct" id="c_goalPct">0%</div><div class="lbl">达成率</div></div>
+    </div>
+    <div class="goal-info">
+      <div class="row"><span>日净利润</span><span class="highlight" id="c_dailyProfit">0 元</span></div>
+      <div class="row"><span>月净利润(30天)</span><span class="highlight" id="c_monthlyProfit">0 元</span></div>
+      <div class="row"><span>距目标</span><span style="color:var(--danger);" id="c_gap">30,000 元</span></div>
+      <div class="row"><span>达标需日均</span><span id="c_targetDaily" style="font-weight:600;">— 单</span></div>
+      <div class="row"><span>按当前速度</span><span id="c_daysToGoal">—</span></div>
+    </div>
+  </div>
+  <div style="display:flex; gap:4px; flex-wrap:wrap;">
+    <button class="preset-btn" onclick="Calc.setOrders(1)">1单/天</button>
+    <button class="preset-btn" onclick="Calc.setOrders(5)">5单/天</button>
+    <button class="preset-btn" onclick="Calc.setOrders(10)">10单/天</button>
+    <button class="preset-btn" onclick="Calc.setOrders(20)">20单/天</button>
+    <button class="preset-btn" onclick="Calc.setOrders(50)">50单/天</button>
+    <button class="preset-btn" onclick="Calc.findTarget()">🎯 几单达标</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">🔍 降价/涨价影响</div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>变动</th><th>$价格</th><th>单件利润</th><th>月利润(10单/天)</th><th>月利润(20单/天)</th></tr></thead>
+    <tbody id="c_whatIf"></tbody>
+  </table></div>
+</div>
+
+<div class="card tips">
+  <div class="card-title">💡 提示</div>
+  ✅ 希音佣金 10%-15%，确认你的实际类目费率<br>
+  ✅ 头程物流走集货降低单件成本<br>
+  ✅ 广告费控制在售价 8%-12%<br>
+  ✅ 降价 $1-2 可能带来显著单量提升
+</div>
+</div>
+
+<!-- ==================== 面板2: Listing生成器 ==================== -->
+<div class="tab-panel" id="panel-listing">
+<div class="panel-title"><h2>Listing<span>生成器</span></h2><p class="sub">一键生成英文标题、描述、关键词</p></div>
+
+<div class="card">
+  <div class="card-title">📦 产品信息</div>
+  <div class="form-row">
+    <div class="form-group"><label>类目</label><select id="l_category">
+      <option value="women-clothing">女装</option><option value="men-clothing">男装</option><option value="accessories">配饰/首饰</option><option value="shoes">鞋类</option><option value="bags">箱包</option><option value="home">家居</option><option value="beauty">美妆工具</option><option value="kids">童装</option><option value="sports">运动户外</option>
+    </select></div>
+    <div class="form-group"><label>风格</label><select id="l_style">
+      <option value="casual">休闲/日常</option><option value="elegant">优雅/气质</option><option value="street">街头/潮牌</option><option value="vintage">复古</option><option value="minimalist">极简</option><option value="sexy">性感</option><option value="boho">波西米亚</option><option value="korean">韩系</option><option value="y2k">Y2K千禧</option>
+    </select></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>产品核心词</label><input type="text" id="l_productName" placeholder="例：碎花连衣裙"></div>
+    <div class="form-group"><label>材质</label><input type="text" id="l_material" placeholder="例：纯棉、雪纺"></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>3-5个卖点（逗号分隔）</label><input type="text" id="l_features" placeholder="例：收腰显瘦, V领, A字裙摆"></div>
+    <div class="form-group"><label>适用场景</label><input type="text" id="l_scene" placeholder="例：夏季日常, 约会, 度假"></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>目标市场</label><select id="l_market"><option value="us">🇺🇸 美国</option><option value="eu">🇪🇺 欧洲</option><option value="middle-east">🇸🇦 中东</option><option value="latam">🇧🇷 拉美</option></select></div>
+    <div class="form-group"><label>价格区间($)</label><input type="text" id="l_priceRange" placeholder="9.99-15.99"></div>
+  </div>
+  <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+    <button class="btn" onclick="Listing.generateAll()">🚀 一键生成</button>
+    <button class="btn btn-outline" onclick="Listing.generateTitles()">只生成标题</button>
+    <button class="btn btn-outline" onclick="Listing.generateDesc()">只生成描述</button>
+    <button class="btn btn-outline" onclick="Listing.generateKW()">只提取关键词</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📝 优化标题 <span id="l_score"></span></div>
+  <div class="output-label"><span>方案A（搜索优先）</span><button class="btn-sm" onclick="Util.copy('l_titleA')">复制</button></div>
+  <div class="output-box" id="l_titleA"></div>
+  <div class="output-label" style="margin-top:10px;"><span>方案B（点击优先）</span><button class="btn-sm" onclick="Util.copy('l_titleB')">复制</button></div>
+  <div class="output-box" id="l_titleB"></div>
+  <div class="output-label" style="margin-top:10px;"><span>方案C（短标题·移动端）</span><button class="btn-sm" onclick="Util.copy('l_titleC')">复制</button></div>
+  <div class="output-box" id="l_titleC"></div>
+</div>
+
+<div class="card">
+  <div class="card-title">📄 描述 & 关键词</div>
+  <div class="output-label"><span>英文描述</span><button class="btn-sm" onclick="Util.copy('l_descEN')">复制</button></div>
+  <div class="output-box" id="l_descEN"></div>
+  <div class="output-label" style="margin-top:10px;"><span>搜索标签</span><button class="btn-sm" onclick="Util.copy('l_kw')">复制</button></div>
+  <div class="output-box" id="l_kw"></div>
+  <div class="output-label" style="margin-top:10px;"><span>长尾关键词</span><button class="btn-sm" onclick="Util.copy('l_longtail')">复制</button></div>
+  <div class="output-box" id="l_longtail"></div>
+</div>
+
+<div class="card tips">
+  ✅ 标题前15字符放核心关键词（Shein搜索加权）<br>
+  ✅ 主图白底，产品占比>70%<br>
+  ✅ 尺码表必须准确（退货第一原因）<br>
+  ✅ 描述前3行写核心卖点<br>
+  ✅ 新品24小时内出评价最重要
+</div>
+</div>
+
+<!-- ==================== 面板3: 数据分析 ==================== -->
+<div class="tab-panel" id="panel-data">
+<div class="panel-title"><h2>销售<span>数据分析</span></h2><p class="sub">粘贴CSV → 自动找爆款、看趋势</p></div>
+
+<div class="card">
+  <div class="card-title">📥 导入数据</div>
+  <div style="display:flex; gap:4px; margin-bottom:10px; flex-wrap:wrap;">
+    <button class="preset-btn active" onclick="Data.switchInput('paste')" id="d_tabPaste">粘贴CSV</button>
+    <button class="preset-btn" onclick="Data.switchInput('upload')" id="d_tabUpload">上传文件</button>
+    <button class="preset-btn" onclick="Data.switchInput('demo')" id="d_tabDemo">演示数据</button>
+  </div>
+  <div id="d_paste"><textarea id="d_csv" placeholder="日期,产品名称,销量,单价($),成本(¥),广告费(¥),运费(¥)&#10;2025-05-01,连衣裙,3,12.99,30,15,9"></textarea></div>
+  <div id="d_upload" style="display:none;"><label class="output-box" style="display:block; text-align:center; cursor:pointer; border:2px dashed var(--border); padding:24px;">📁 点击选择CSV文件<input type="file" id="d_file" accept=".csv,.txt" style="display:none;"></label></div>
+  <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <button class="btn" onclick="Data.analyze()">📊 分析</button>
+    <span style="font-size:12px; color:var(--text-secondary);">汇率:</span><input type="number" id="d_exchangeRate" value="7.25" step="0.01" style="width:70px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; color:var(--text); padding:4px 8px; font-size:13px;">
+    <span style="font-size:12px; color:var(--text-secondary);">佣金%:</span><input type="number" id="d_commissionRate" value="12" step="0.1" style="width:60px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; color:var(--text); padding:4px 8px; font-size:13px;">
+  </div>
+</div>
+
+<div class="card" id="d_kpiCard" style="display:none;">
+  <div class="card-title">📈 核心指标</div>
+  <div class="kpi-grid">
+    <div class="kpi-item"><div class="label">总销售额</div><div class="value" id="d_revenue">—</div><div class="sub" id="d_orders">—</div></div>
+    <div class="kpi-item"><div class="label">总净利润</div><div class="value" id="d_profit">—</div><div class="sub" id="d_profitRate">—</div></div>
+    <div class="kpi-item"><div class="label">日均净利润</div><div class="value" id="d_avgDaily">—</div><div class="sub" id="d_days">—</div></div>
+    <div class="kpi-item"><div class="label">3万目标达成率</div><div class="value" id="d_target">—</div><div class="sub" id="d_remain">—</div></div>
+  </div>
+</div>
+
+<div class="card" id="d_productCard" style="display:none;">
+  <div class="card-title">🏆 产品利润排行</div>
+  <div class="table-wrap"><table><thead><tr><th>产品</th><th>销量</th><th>单价$</th><th>收入¥</th><th>成本¥</th><th>净利¥</th><th>利润率</th><th>占比</th></tr></thead><tbody id="d_productBody"></tbody></table></div>
+</div>
+
+<div class="card" id="d_trendCard" style="display:none;">
+  <div class="card-title">📅 每日趋势</div>
+  <div class="table-wrap"><table><thead><tr><th>日期</th><th>单量</th><th>销售额¥</th><th>净利¥</th><th>累计¥</th><th>趋势</th></tr></thead><tbody id="d_trendBody"></tbody></table></div>
+</div>
+
+<div class="card tips" id="d_tipsCard" style="display:none;"><div class="card-title">💡 分析建议</div><div id="d_tipsContent"></div></div>
+</div>
+
+<!-- ==================== 面板4: 竞品监控 ==================== -->
+<div class="tab-panel" id="panel-competitor">
+<div class="panel-title"><h2>竞品<span>监控</span></h2><p class="sub">手动记录竞品价格 · 追踪变动 · 数据存本地</p></div>
+
+<div class="card">
+  <div class="card-title">➕ 添加竞品</div>
+  <div class="form-row">
+    <div class="form-group"><label>竞品名称</label><input type="text" id="cmp_name" placeholder="例：Floral Print Dress"></div>
+    <div class="form-group"><label>当前售价($)</label><input type="number" id="cmp_price" placeholder="12.99" step="0.01"></div>
+    <div class="form-group"><label>预估日销</label><input type="number" id="cmp_sales" placeholder="20"></div>
+    <div class="form-group"><label>你的对标品</label><input type="text" id="cmp_myProduct" placeholder="你的产品名"></div>
+  </div>
+  <button class="btn" onclick="Competitor.add()" style="margin-top:10px;">添加竞品</button>
+</div>
+
+<div class="card" id="cmp_updateCard" style="display:none;">
+  <div class="card-title">📝 批量更新价格</div>
+  <div id="cmp_updateList"></div>
+  <button class="btn" onclick="Competitor.batchUpdate()" style="margin-top:10px;">💾 保存今日价格</button>
+</div>
+
+<div class="card">
+  <div class="card-title" style="justify-content:space-between;"><span>📊 竞品列表</span><button class="btn-danger" onclick="Competitor.clearAll()">清空</button></div>
+  <div id="cmp_table"></div>
+</div>
+
+<div class="card tips">
+  ✅ 每天花10分钟在Shein搜核心关键词，记录前10名价格<br>
+  ✅ 关注同风格同价格带的对手<br>
+  ✅ 竞品涨价→机会窗口，保持原价抢量<br>
+  ✅ 竞品降价→观察3天再决定是否跟进
+</div>
+</div>
+
+<!-- ==================== 面板5: 核价话术生成器 ==================== -->
+<div class="tab-panel" id="panel-price">
+<div class="panel-title"><h2>核价<span>话术生成器</span></h2><p class="sub">填产品信息 → 一键生成核价话术 · 成本拆解 · 图片优化方案</p></div>
+
+<div class="card">
+  <div class="card-title">📦 产品信息</div>
+  <div class="form-row">
+    <div class="form-group"><label>产品名称</label><input type="text" id="pr_productName" placeholder="例：夏季碎花雪纺连衣裙"></div>
+    <div class="form-group"><label>类目</label><select id="pr_category">
+      <option value="dress">连衣裙</option><option value="top">上衣/T恤</option><option value="bottom">裤装/半裙</option><option value="outerwear">外套</option><option value="accessories">配饰/首饰</option><option value="shoes">鞋类</option><option value="bag">箱包</option><option value="home">家居</option>
+    </select></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>核心材质/面料</label><input type="text" id="pr_material" placeholder="例：100%涤纶雪纺, 里料涤棉"></div>
+    <div class="form-group"><label>工艺亮点</label><input type="text" id="pr_craft" placeholder="例：3D立体剪裁, 双层荷叶边, 隐形拉链"></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>3-5个产品卖点（逗号分隔）</label><input type="text" id="pr_features" placeholder="例：收腰显瘦, V领修饰脸型, A字裙摆遮胯"></div>
+    <div class="form-group"><label>差异化亮点（与竞品不同的点）</label><input type="text" id="pr_diff" placeholder="例：独家印花花型, 加了防走光内衬, 可调节腰围"></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>采购成本（¥）</label><div class="input-suffix"><input type="number" id="pr_cost" value="30" step="0.01"><span class="suffix">¥</span></div></div>
+    <div class="form-group"><label>想报给希音的价格（¥）</label><div class="input-suffix"><input type="number" id="pr_price" value="65" step="0.01"><span class="suffix">¥</span></div></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>竞品平台售价（$，选填）</label><div class="input-suffix"><input type="number" id="pr_competitorPrice" placeholder="12.99" step="0.01"><span class="suffix">$</span></div></div>
+    <div class="form-group"><label>面料成本（¥/件，选填）</label><div class="input-suffix"><input type="number" id="pr_fabricCost" placeholder="12" step="0.01"><span class="suffix">¥</span></div></div>
+  </div>
+  <div class="form-row" style="margin-top:8px;">
+    <div class="form-group"><label>首单MOQ（件）</label><input type="number" id="pr_moq" value="100" step="1"></div>
+    <div class="form-group"><label>交货天数</label><input type="number" id="pr_delivery" value="7" step="1"></div>
+  </div>
+  <button class="btn" onclick="PriceReview.generate()" style="margin-top:14px;">🚀 生成核价话术 + 图片优化方案</button>
+</div>
+
+<div class="card" id="pr_outputCard" style="display:none;">
+  <div class="card-title">📋 核价提交话术（可直接复制粘贴到希音后台）</div>
+  <div class="output-label"><span>主话术</span><button class="btn-sm" onclick="Util.copy('pr_script')">复制</button></div>
+  <div class="output-box" id="pr_script"></div>
+  <div class="output-label" style="margin-top:10px;"><span>成本结构说明</span><button class="btn-sm" onclick="Util.copy('pr_costBreakdown')">复制</button></div>
+  <div class="output-box" id="pr_costBreakdown"></div>
+  <div class="output-label" style="margin-top:10px;"><span>工艺/面料支撑</span><button class="btn-sm" onclick="Util.copy('pr_craftDesc')">复制</button></div>
+  <div class="output-box" id="pr_craftDesc"></div>
+</div>
+
+<div class="card" id="pr_imageCard" style="display:none;">
+  <div class="card-title">📸 产品图上传 & 分析</div>
+
+  <!-- Upload Area -->
+  <div id="pr_uploadArea" style="border:2px dashed var(--border); border-radius:12px; padding:32px; text-align:center; cursor:pointer; transition:border-color 0.2s; margin-bottom:16px;"
+       onclick="document.getElementById('pr_fileInput').click()"
+       ondragover="this.style.borderColor='var(--accent)'; return false;"
+       ondragleave="this.style.borderColor='var(--border)'; return false;"
+       ondrop="PriceReview.handleDrop(event); return false;">
+    <div style="font-size:48px; margin-bottom:8px;">📁</div>
+    <div style="color:var(--text); font-size:14px;">拖拽产品图到这里，或点击选择</div>
+    <div style="color:var(--text-secondary); font-size:12px; margin-top:4px;">支持 JPG / PNG / WebP</div>
+    <input type="file" id="pr_fileInput" accept="image/*" onchange="PriceReview.handleFile(this)" style="display:none;">
+  </div>
+
+  <!-- Preview + Analysis -->
+  <div id="pr_previewArea" style="display:none;">
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+      <div style="flex:0 0 auto; max-width:280px;">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">你的原图</div>
+        <img id="pr_previewImg" style="width:100%; border-radius:8px; border:1px solid var(--border);">
+      </div>
+      <div style="flex:1; min-width:200px;">
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">图片分析</div>
+        <div id="pr_analysis" style="font-size:13px; line-height:1.8;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Prompts -->
+  <div style="margin-top:16px;">
+    <div class="output-label"><span>Shein 主图 · AI 生图提示词</span><button class="btn-sm" onclick="Util.copy('pr_aiPrompt')">复制</button></div>
+    <div class="output-box" id="pr_aiPrompt"></div>
+    <div class="output-label" style="margin-top:10px;"><span>细节特写 · AI 生图提示词</span><button class="btn-sm" onclick="Util.copy('pr_aiPrompt2')">复制</button></div>
+    <div class="output-box" id="pr_aiPrompt2"></div>
+    <div class="output-label" style="margin-top:10px;"><span>白底产品图 · AI 生图提示词</span><button class="btn-sm" onclick="Util.copy('pr_aiPrompt3')">复制</button></div>
+    <div class="output-box" id="pr_aiPrompt3"></div>
+  </div>
+</div>
+
+<div class="card" id="pr_tipsCard" style="display:none;">
+  <div class="card-title">💡 核价提交时机 & 策略提醒</div>
+  <div class="tips" id="pr_tipsContent"></div>
+</div>
+</div>
+
+<script>
+const PriceReview = (() => {
+  const catMap = {
+    dress: { name:'连衣裙', range:'1.8~3.0', keywords:'dress, maxi dress, midi dress, summer dress' },
+    top: { name:'上衣/T恤', range:'1.6~2.2', keywords:'top, blouse, shirt, t-shirt, tee' },
+    bottom: { name:'裤装/半裙', range:'1.6~2.5', keywords:'pants, skirt, trousers, wide leg' },
+    outerwear: { name:'外套', range:'2.0~3.5', keywords:'jacket, coat, blazer, cardigan, outerwear' },
+    accessories: { name:'配饰/首饰', range:'2.0~4.0', keywords:'necklace, earrings, bracelet, accessory' },
+    shoes: { name:'鞋类', range:'2.0~3.5', keywords:'shoes, heels, sandals, sneakers, boots' },
+    bag: { name:'箱包', range:'2.0~4.0', keywords:'bag, handbag, tote, crossbody, purse' },
+    home: { name:'家居', range:'1.8~3.0', keywords:'home decor, cushion, rug, bedding, vase' },
+  };
+
+  function g(id) { return Util.q(id).value.trim(); }
+  function gf(id) { return parseFloat(Util.q(id).value) || 0; }
+
+  function generate() {
+    const name = g('pr_productName') || '时尚新品';
+    const catKey = g('pr_category') || 'dress';
+    const cat = catMap[catKey] || catMap.dress;
+    const material = g('pr_material') || '优质面料';
+    const craft = g('pr_craft') || '精工制作';
+    const featuresStr = g('pr_features') || '时尚设计, 舒适穿着';
+    const features = featuresStr.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+    const diff = g('pr_diff') || features[0] || '独家设计';
+    const cost = gf('pr_cost') || 30;
+    const price = gf('pr_price') || 65;
+    const compPrice = gf('pr_competitorPrice');
+    const fabricCost = gf('pr_fabricCost') || (cost * 0.4).toFixed(0);
+    const moq = parseInt(g('pr_moq')) || 100;
+    const delivery = parseInt(g('pr_delivery')) || 7;
+
+    const laborCost = (cost * 0.3).toFixed(0);
+    const packagingCost = (cost * 0.1).toFixed(0);
+    const logisticsCost = (cost * 0.1).toFixed(0);
+    const otherCost = (cost - fabricCost - laborCost - packagingCost - logisticsCost).toFixed(0);
+    const margin = price > 0 ? ((price - cost) / price * 100).toFixed(1) : 0;
+    const recommendedMin = (cost * parseFloat(cat.range.split('~')[0])).toFixed(0);
+    const recommendedMax = (cost * parseFloat(cat.range.split('~')[1])).toFixed(0);
+
+    // Cost breakdown
+    const costBreakdown = `【成本结构说明】
+采购成本：¥${cost.toFixed(2)}/件，具体构成：
+  · 面辅料成本：¥${fabricCost}/件（${material}）
+  · 加工工费：¥${laborCost}/件（${craft}）
+  · 包装耗材：¥${packagingCost}/件
+  · 物流运费：¥${logisticsCost}/件
+  · 其他（质检/管理摊销）：¥${otherCost}/件
+报价：¥${price.toFixed(2)}/件，毛利率：${margin}%
+MOQ：${moq}件 | 交期：${delivery}天
+${compPrice > 0 ? '竞品平台售价约$' + compPrice + '，我方报价折合约$' + (price/7.25).toFixed(2) + '，具备价格优势。' : '报价在' + cat.name + '类目合理区间（成本×' + cat.range + '）内。'}`;
+
+    Util.q('pr_costBreakdown').textContent = costBreakdown;
+
+    // Craft description
+    const craftDesc = `【工艺与面料说明】
+1. 主面料：${material}，手感柔软，透气性好，色牢度4级以上
+2. 工艺特点：${craft}${features.length > 0 ? '，' + features.slice(0,3).join('、') : ''}
+3. 做工细节：
+   · 车线密度12针/3cm，线迹平整无跳针
+   · 关键受力部位打枣加固，耐穿不易脱线
+   · 面料经过预缩处理，水洗后尺寸稳定（缩水率<3%）
+4. 质检标准：AQL 2.5 二级检验，线头/污渍/尺寸偏差逐件检验
+5. 包装：单件入OPP袋+挂卡，30件/箱，外箱贴唛头`;
+
+    Util.q('pr_craftDesc').textContent = craftDesc;
+
+    // Main script
+    const script = `【${name} 核价说明】
+
+尊敬的买手您好，
+
+本品为${material}制作的${cat.name}，采用${craft}工艺。
+
+核心卖点：
+${features.map((f,i) => (i+1) + '. ' + f).join('\n')}
+
+差异化优势：
+${diff.split(/[,，]/).map(s => s.trim()).filter(Boolean).map((d,i) => (i+1) + '. ' + d).join('\n')}
+
+价格说明：
+采购成本 ¥${cost.toFixed(2)}/件，报价 ¥${price.toFixed(2)}/件（毛利率${margin}%），在${cat.name}类目成本×${cat.range}合理区间内。${compPrice > 0 ? '平台同款售价约$' + compPrice + '，我方供货价具备竞争力。' : ''}
+
+供货承诺：
+MOQ ${moq}件起订，交期${delivery}天，可分批交货。支持OEM定制（换色/换标/改细节），长期合作价格可再议。
+
+附件：产品实拍多角度图 + 面料细节 + 尺码表 + 成本清单
+期待您的审核，如有任何问题随时沟通！`;
+
+    Util.q('pr_script').textContent = script;
+
+    // AI Image Prompts
+    const scene = catKey==='dress'?'European street with natural sunlight, full body shot, female model walking naturally, hair flowing, candid lifestyle feel, golden hour lighting'
+      : catKey==='top'?'clean minimalist studio, half-body shot, soft front lighting, fabric texture visible, simple pose'
+      : catKey==='bottom'?'urban street scene, full body shot from low angle, natural stride, outdoor daylight'
+      : catKey==='outerwear'?'city rooftop or modern architecture background, editorial fashion pose, dramatic natural light, wind-blown hair'
+      : catKey==='accessories'?'extreme close-up macro on white marble surface, jewelry floating effect, professional product lighting, reflection control'
+      : catKey==='shoes'?'dynamic walking shot from low angle, urban ground texture, motion blur on background, focus on shoe details'
+      : catKey==='bag'?'minimalist white room, shoulder bag on model, half-body with bag focus, soft window light, bokeh background'
+      : 'clean Scandinavian interior, natural daylight, lifestyle product placement, cozy atmosphere';
+
+    const detailScene = catKey==='accessories'?'macro lens close-up of jewelry clasp and surface finish, goldsmith quality, reflective highlights, 5cm working distance'
+      : 'macro shot of fabric weave and stitching detail, 45-degree raking light to show texture, needlework precision visible';
+
+    const aiPrompt1 = `High-end e-commerce product photo for Shein fashion platform:
+${name} - ${material} ${cat.name}.
+${scene}.
+Professional fashion photography, sharp focus, true-to-life colors, soft natural lighting.
+White balance 5500K, no heavy filters, clean commercial look.
+800x800px, JPEG quality 100.
+--ar 1:1 --style raw --v 6.0`;
+
+    const aiPrompt2 = `Extreme close-up detail shot for fashion e-commerce quality inspection:
+${name} - ${material}.
+${detailScene}.
+Studio lighting with diffuser, shallow depth of field (f/2.8), professional macro lens.
+Show craftsmanship quality: ${craft}.
+No retouching, authentic texture, suitable for supplier quality verification.
+--ar 1:1 --style raw --v 6.0`;
+
+    const aiPrompt3 = `Clean product photography, pure white background (#FFFFFF), studio lighting:
+${name}, ${cat.name}, ${material}.
+Front view, flat lay or ghost mannequin, no shadows on background, evenly lit.
+Commercial e-commerce white background shot, Shein standard product image.
+800x800px, isolated product, no props, no text, no watermark.
+--ar 1:1 --style raw --v 6.0`;
+
+    Util.q('pr_aiPrompt').textContent = aiPrompt1;
+    Util.q('pr_aiPrompt2').textContent = aiPrompt2;
+    Util.q('pr_aiPrompt3').textContent = aiPrompt3;
+
+    // Tips
+    const hour = new Date().getHours();
+    const weekday = new Date().getDay();
+    const timeTip = (weekday === 1 && hour < 10) ? '⚠️ 当前是周一上午（买手审核高峰），建议推迟到下午提交。' : '✅ 当前时段适合提交核价。';
+    Util.q('pr_tipsContent').innerHTML = `
+      ${timeTip}<br>
+      ✅ ${cat.name}类目合理报价区间：成本×${cat.range} = ¥${recommendedMin} ~ ¥${recommendedMax}<br>
+      ✅ 你的报价 ¥${price} ${price >= recommendedMin && price <= recommendedMax ? '在合理区间内 ✅' : price < recommendedMin ? '偏低，可以考虑提价' : '偏高，风险较大，建议调整到 ¥' + recommendedMax + ' 以内'}<br>
+      ✅ 首次报价被拒，降5-8%二次提交（降至 ¥${(price*0.93).toFixed(0)} 左右）<br>
+      ✅ 毛利率 ${margin}%，${margin > 25 ? '利润空间充足' : margin > 15 ? '利润合理' : '利润偏低，注意控制成本'}<br>
+      ✅ 提交材料越齐全（实拍图+成本拆解+尺码表），核价通过率越高
+    `;
+
+    Util.q('pr_outputCard').style.display = 'block';
+    Util.q('pr_imageCard').style.display = 'block';
+    Util.q('pr_tipsCard').style.display = 'block';
+    Util.q('pr_outputCard').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ===== Image Upload & Analysis =====
+  let uploadedImageData = null;
+  let imageAnalysis = null;
+
+  function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (!file.type.match(/image\/(jpeg|png|webp)/)) { alert('请上传 JPG/PNG/WebP 格式的图片'); return; }
+    processImage(file);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    e.target.style.borderColor = 'var(--border)';
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.match(/image\/(jpeg|png|webp)/)) {
+      processImage(file);
+    }
+  }
+
+  function processImage(file) {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const dataUrl = ev.target.result;
+      uploadedImageData = dataUrl;
+
+      // Show preview
+      Util.q('pr_previewImg').src = dataUrl;
+      Util.q('pr_previewArea').style.display = 'flex';
+      Util.q('pr_uploadArea').style.display = 'none';
+
+      // Analyze
+      const img = new Image();
+      img.onload = function() {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        const ratio = (w / h).toFixed(2);
+        const mp = (w * h / 1000000).toFixed(1);
+
+        // Basic brightness analysis via canvas sampling
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const scale = Math.min(1, 200 / Math.max(w, h));
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imgData.data;
+        let totalBright = 0, darkPx = 0, brightPx = 0;
+        const len = pixels.length;
+        for (let i = 0; i < len; i += 4) {
+          const bright = (pixels[i] * 0.299 + pixels[i+1] * 0.587 + pixels[i+2] * 0.114);
+          totalBright += bright;
+          if (bright < 40) darkPx++;
+          if (bright > 240) brightPx++;
+        }
+        const pxCount = len / 4;
+        const avgBright = Math.round(totalBright / pxCount);
+        const darkPct = Math.round(darkPx / pxCount * 100);
+        const brightPct = Math.round(brightPx / pxCount * 100);
+
+        const issues = [];
+        const goods = [];
+
+        if (w < 800 || h < 800) issues.push(`❌ 分辨率仅 ${w}×${h}，Shein要求≥800×800px`);
+        else goods.push(`✅ 分辨率 ${w}×${h}（${mp}MP），满足Shein要求`);
+
+        if (ratio < 0.9 || ratio > 1.1) issues.push(`⚠️ 宽高比 ${ratio}:1，建议1:1方形（Shein主图标准）`);
+        else goods.push('✅ 宽高比1:1，符合Shein标准');
+
+        if (avgBright < 80) issues.push(`⚠️ 整体偏暗（亮度${avgBright}/255），建议补光拍摄`);
+        else if (avgBright > 220) issues.push(`⚠️ 整体过亮/过曝（亮度${avgBright}/255），细节可能丢失`);
+        else goods.push(`✅ 亮度适中（${avgBright}/255）`);
+
+        if (darkPct > 20) issues.push(`⚠️ 暗部占比${darkPct}%，存在大面积阴影区`);
+        if (brightPct > 50) issues.push(`⚠️ 高亮占比${brightPct}%，可能过曝或白底过亮`);
+
+        if (!issues.includes('❌ 分辨率仅') && mp < 0.5) issues.push('⚠️ 像素偏低，面料细节可能不够清晰');
+        if (mp >= 1) goods.push('✅ 像素充足，可展示面料细节');
+
+        imageAnalysis = { w, h, ratio, mp, avgBright, darkPct, brightPct, issues, goods, fileName: file.name, fileSize: (file.size/1024).toFixed(0) + 'KB' };
+
+        // Render analysis
+        let html = `<div style="margin-bottom:6px;">📏 ${w}×${h}px · ${mp}MP · ${imageAnalysis.fileSize} · ${ratio}:1</div>`;
+        goods.forEach(g => html += `<div style="color:var(--accent);">${g}</div>`);
+        issues.forEach(i => html += `<div style="color:var(--danger);">${i}</div>`);
+        html += `<div style="margin-top:6px; color:var(--text-secondary); font-size:12px;">💡 提示词已根据图片分析结果自动调整</div>`;
+        Util.q('pr_analysis').innerHTML = html;
+
+        // Regenerate prompts with image analysis
+        if (Util.q('pr_outputCard').style.display !== 'none') {
+          regeneratePrompts();
+        }
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function regeneratePrompts() {
+    if (!imageAnalysis) return;
+    const a = imageAnalysis;
+    const name = g('pr_productName') || '时尚新品';
+    const catKey = g('pr_category') || 'dress';
+    const cat = catMap[catKey] || catMap.dress;
+    const material = g('pr_material') || '优质面料';
+    const craft = g('pr_craft') || '精工制作';
+
+    const scene = catKey==='dress'?'European street, natural sunlight, female model walking, golden hour'
+      : catKey==='top'?'clean minimalist studio, half-body, soft front lighting'
+      : catKey==='bottom'?'urban street, low angle full body shot, daylight'
+      : catKey==='outerwear'?'modern architecture rooftop, editorial fashion, dramatic light'
+      : catKey==='accessories'?'white marble macro close-up, professional product lighting'
+      : catKey==='shoes'?'dynamic low angle walking shot, urban ground'
+      : catKey==='bag'?'minimalist white room, shoulder bag on model, window light'
+      : 'clean Scandinavian interior, natural daylight';
+
+    // Adjust based on analysis
+    const lightFix = a.avgBright < 80 ? 'bright natural daylight, additional fill light, ' :
+                     a.avgBright > 220 ? 'soft diffused light, reduce exposure, ' : '';
+    const qualityFix = a.w < 800 ? 'upscaled to 1024x1024, high resolution, sharp details, ' : 'sharp details, high resolution, ';
+    const ratioFix = a.ratio < 0.95 || a.ratio > 1.05 ? 'recommend adjusting to 1:1 square format, ' : '';
+
+    const ai1 = `High-end e-commerce photo for Shein:
+${name} - ${material} ${cat.name}.
+${scene}, ${lightFix}${qualityFix}${ratioFix}professional fashion photography.
+True-to-life colors, white balance 5500K, clean commercial look, no heavy filters.
+800x800px minimum, JPEG quality 100.
+--ar 1:1 --style raw --v 6.0`;
+
+    const ai2 = `Extreme close-up macro detail shot for e-commerce quality verification:
+${name} - ${material}, ${craft}.
+Macro lens, ${a.mp < 0.5 ? 'ultra-high resolution to capture fabric texture, ' : ''}45-degree raking light to highlight surface texture.
+Shallow depth of field f/2.8, studio lighting with diffuser.
+Show craftsmanship: stitching precision, material weave, hardware quality.
+Authentic texture, suitable for supplier quality submission.
+--ar 1:1 --style raw --v 6.0`;
+
+    const ai3 = `Clean product shot, pure white background #FFFFFF:
+${name}, ${cat.name}, ${material}.
+Front view flat lay or ghost mannequin, studio lighting, no shadows on background.
+Even exposure, zero background gradient, commercial e-commerce white background standard.
+Isolated product only, no props, no text, no watermark, Shein standard.
+800x800px minimum.
+--ar 1:1 --style raw --v 6.0`;
+
+    Util.q('pr_aiPrompt').textContent = ai1;
+    Util.q('pr_aiPrompt2').textContent = ai2;
+    Util.q('pr_aiPrompt3').textContent = ai3;
+  }
+
+  // Override generate to use image analysis
+  const originalGenerate = generate;
+  generate = function() {
+    originalGenerate();
+    if (uploadedImageData) {
+      regeneratePrompts();
+    }
+  };
+
+  return { generate, handleFile, handleDrop };
+})();
+</script>
+
+<!-- ==================== 面板6: 使用指南 ==================== -->
+<div class="tab-panel" id="panel-guide">
+<div class="panel-title"><h2>30天<span>执行手册</span></h2><p class="sub">从0到3万净利润的实战路线图</p></div>
+
+<div class="card"><div class="card-title">🎯 3万 = 什么概念？</div>
+<div class="output-box">每天净利润 <strong>1,000 元</strong><br>
+每单赚20元 → 日均50单 | 每单赚30元 → 日均34单 | 每单赚50元 → 日均20单<br>
+→ 去「利润计算」面板倒推你的目标定价和单量</div></div>
+
+<div class="card"><div class="card-title">📅 第一周：选品+上架</div>
+<div class="tips">
+1. 在Shein搜类目Top关键词，看前20名卖什么、什么价位<br>
+2. 找出3-5个卖得好但竞争不太激烈的品（排名20-50的）<br>
+3. 用利润计算器算每款的盈亏线<br>
+4. 用Listing生成器生成优化标题和描述<br>
+5. 上架至少10个SKU（店铺SKU越多曝光越大）<br>
+6. 找工厂拿样品，确认质量
+</div></div>
+
+<div class="card"><div class="card-title">📅 第二周：测款+优化</div>
+<div class="tips">
+1. 上架后3-5天没出单→分析原因（价格？主图？标题？）<br>
+2. 出单的品：小额开广告（每天30-50元/品），观察转化率<br>
+3. 每天用竞品监控记录同类价格变化<br>
+4. 转化率>3%→加预算；<1%→停掉<br>
+5. 学竞品主图的构图和风格
+</div></div>
+
+<div class="card"><div class="card-title">📅 第三周：放大+追单</div>
+<div class="tips">
+1. 用数据分析器找出最赚钱的品<br>
+2. 高利润品：加广告+考虑提价$1-2<br>
+3. 高销量品：确保库存充足<br>
+4. 模仿爆款再上3-5个相似款<br>
+5. 关注店铺评分，及时回复买家
+</div></div>
+
+<div class="card"><div class="card-title">📅 第四周：冲刺3万</div>
+<div class="tips">
+1. 集中火力推利润率最高的2-3个品<br>
+2. 用数据分析器看累计利润离目标多远<br>
+3. 还差→短期促销降价抢单+好评<br>
+4. 记录这个月学到的东西
+</div></div>
+
+<div class="card"><div class="card-title">⚠️ 新人必避的坑</div>
+<div class="tips">
+❌ 盲目低价→价格太低被怀疑质量<br>
+❌ 不计算就投广告→每单广告费超利润50%要警惕<br>
+❌ 主图随便拍→Shein是视觉平台，主图决定点击率<br>
+❌ 尺码表乱写→退货率>10%会被限流<br>
+❌ 断货不补→排名归零重新开始<br>
+❌ 不回消息→24h内必须回复
+</div></div>
+</div>
+
+<div class="toast" id="toast">✅ 已复制</div>
+
+<script>
+// ===== Utility =====
+const Util = {
+  q(id) { return document.getElementById(id); },
+  copy(id) {
+    const el = this.q(id); const text = el.textContent || el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const t = this.q('toast'); t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1500);
+    });
+  },
+  esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+};
+
+// ===== Tab Navigation =====
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  if (!e.target.classList.contains('tab-btn')) return;
+  const panel = e.target.dataset.panel;
+  this.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  Util.q('panel-' + panel).classList.add('active');
+});
+
+// ==========================================
+// 面板1: 利润计算器
+// ==========================================
+const Calc = (() => {
+  const presets = {
+    clothing: { commissionRate:12, productCost:30, adCost:5 },
+    accessories: { commissionRate:10, productCost:8, adCost:3 },
+    home: { commissionRate:15, productCost:25, adCost:6 },
+    shoes: { commissionRate:12, productCost:45, adCost:7 },
+    bag: { commissionRate:12, productCost:40, adCost:6 },
+  };
+  const TARGET = 30000, DAYS = 30;
+
+  const ids = ['c_productCost','c_domesticShipping','c_intlLogistics','c_commissionRate','c_adCost','c_otherCost','c_priceUSD','c_exchangeRate','c_dailyOrders'];
+
+  function g(id) { return parseFloat(Util.q(id).value) || 0; }
+
+  function update() {
+    const pc = g('c_productCost'), ds = g('c_domesticShipping'), il = g('c_intlLogistics');
+    const cr = g('c_commissionRate') / 100, ac = g('c_adCost'), oc = g('c_otherCost');
+    const usd = g('c_priceUSD'), er = g('c_exchangeRate');
+    const cny = usd * er;
+    const comm = cny * cr;
+    const totalCost = pc + ds + il + comm + ac + oc;
+    const netProfit = cny - totalCost;
+    const margin = cny > 0 ? (netProfit / cny) * 100 : 0;
+    const be = totalCost / (er * (1 - cr));
+
+    Util.q('c_priceCNY').textContent = cny.toFixed(2);
+    Util.q('c_totalCost').textContent = totalCost.toFixed(2) + ' 元';
+    Util.q('c_netProfit').textContent = netProfit.toFixed(2) + ' 元';
+    Util.q('c_netProfit').className = 'value ' + (netProfit > 0 ? 'profit-positive' : netProfit < 0 ? 'profit-negative' : 'profit-neutral');
+    Util.q('c_profitMargin').textContent = margin.toFixed(1) + '%';
+    Util.q('c_profitMargin').className = 'value ' + (margin > 15 ? 'profit-positive' : margin > 5 ? 'profit-neutral' : 'profit-negative');
+    Util.q('c_breakEven').textContent = '$' + be.toFixed(2);
+
+    const daily = parseInt(Util.q('c_dailyOrders').value) || 0;
+    const dp = netProfit * daily;
+    const mp = dp * DAYS;
+    const progress = Math.min((mp / TARGET) * 100, 100);
+    const gap = TARGET - mp;
+    const targetDaily = netProfit > 0 ? Math.ceil(TARGET / DAYS / netProfit) : Infinity;
+
+    Util.q('c_dailyOrdersLabel').textContent = daily + ' 单';
+    Util.q('c_dailyProfit').textContent = dp.toFixed(2) + ' 元';
+    Util.q('c_monthlyProfit').textContent = mp.toFixed(2) + ' 元';
+    const gapEl = Util.q('c_gap');
+    gapEl.textContent = gap > 0 ? gap.toFixed(2) + ' 元' : '✅ 已达标！';
+    gapEl.style.color = gap <= 0 ? 'var(--accent)' : 'var(--danger)';
+    Util.q('c_targetDaily').textContent = targetDaily === Infinity ? '亏损中' : targetDaily + ' 单/天';
+    Util.q('c_daysToGoal').textContent = netProfit <= 0 ? '亏损中' : daily === 0 ? '等待出单' : gap <= 0 ? '🎉 已达成！' : '约 ' + Math.ceil(gap / (netProfit * daily)) + ' 天';
+    Util.q('c_goalPct').textContent = progress.toFixed(0) + '%';
+    Util.q('c_goalCircle').style.setProperty('--progress', progress * 3.6 + 'deg');
+
+    // What-if
+    let html = '';
+    [0.85,0.90,0.95,1.00,1.05,1.10,1.15].forEach(f => {
+      const u = (usd * f).toFixed(2), c = u * er;
+      const cost = pc + ds + il + (c * cr) + ac + oc;
+      const p = c - cost;
+      const cls = p > 0 ? 'profit-positive' : 'profit-negative';
+      const style = f === 1 ? 'font-weight:600;color:var(--accent);' : '';
+      html += `<tr style="${style}"><td>${f < 1 ? '降价' + ((1-f)*100).toFixed(0) + '%' : f > 1 ? '涨价' + ((f-1)*100).toFixed(0) + '%' : '当前'}</td><td>$${u}</td><td class="${cls}">${p.toFixed(2)}元</td><td>${(p*10*DAYS).toFixed(0)}元</td><td>${(p*20*DAYS).toFixed(0)}元</td></tr>`;
+    });
+    Util.q('c_whatIf').innerHTML = html;
+    save();
+  }
+
+  function save() {
+    const d = {}; ids.forEach(i => d[i] = Util.q(i).value);
+    localStorage.setItem('shein-calc-v2', JSON.stringify(d));
+  }
+  function load() {
+    try { const d = JSON.parse(localStorage.getItem('shein-calc-v2')); if (d) ids.forEach(i => { if (d[i] !== undefined) Util.q(i).value = d[i]; }); } catch(e) {}
+  }
+
+  function setOrders(n) { Util.q('c_dailyOrders').value = n; update(); }
+  function findTarget() {
+    const cny = g('c_priceUSD') * g('c_exchangeRate');
+    const cost = g('c_productCost') + g('c_domesticShipping') + g('c_intlLogistics') + (cny * g('c_commissionRate') / 100) + g('c_adCost') + g('c_otherCost');
+    const np = cny - cost;
+    if (np <= 0) { alert('亏损中，无法达标。请调整定价或降成本。'); return; }
+    Util.q('c_dailyOrders').value = Math.ceil(TARGET / DAYS / np);
+    update();
+  }
+
+  // Presets
+  Util.q('calcPresets').addEventListener('click', function(e) {
+    if (!e.target.classList.contains('preset-btn')) return;
+    this.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    const cat = e.target.dataset.cat;
+    if (cat === 'custom' || !presets[cat]) return;
+    Util.q('c_commissionRate').value = presets[cat].commissionRate;
+    Util.q('c_productCost').value = presets[cat].productCost;
+    Util.q('c_adCost').value = presets[cat].adCost;
+    update();
+  });
+
+  ids.forEach(id => Util.q(id).addEventListener('input', update));
+  load(); update();
+  return { setOrders, findTarget, update };
+})();
+
+// ==========================================
+// 面板2: Listing生成器
+// ==========================================
+const Listing = (() => {
+  const kwDB = {
+    'women-clothing': { core:['dress','top','blouse','skirt','pants','set'], attr:['floral','solid','striped','printed','ribbed','ruched'], fit:['slim fit','loose fit','oversized','bodycon','A-line','wrap'], occasion:['casual','party','vacation','date night','work','beach'], material:['cotton','polyester','chiffon','knit','denim','satin'], season:['summer','spring','fall','winter'], neckline:['v neck','square neck','off shoulder','halter'], sleeve:['short sleeve','long sleeve','sleeveless','puff sleeve'] },
+    'accessories': { core:['necklace','earrings','bracelet','ring','hair clip'], attr:['gold','silver','pearl','crystal','vintage','minimalist'], style:['elegant','boho','dainty','statement'], material:['stainless steel','alloy','gold plated','resin'], occasion:['daily','party','wedding','gift'] },
+    'bags': { core:['tote bag','shoulder bag','crossbody','backpack','handbag'], attr:['large capacity','mini','chain','quilted','woven'], material:['leather','pu leather','canvas','nylon'], occasion:['daily','work','shopping','travel','party'] },
+    'home': { core:['cushion cover','rug','curtain','bedding set','vase','lamp'], attr:['boho','modern','minimalist','vintage','Scandinavian'], material:['cotton','linen','ceramic','wood','glass'], room:['living room','bedroom','bathroom','kitchen'] },
+    'beauty': { core:['makeup brush','sponge','mirror','hair tool','nail art'], attr:['portable','professional','silicone','waterproof'], material:['silicone','plastic','metal','fiber'] },
+    'kids': { core:['dress','t-shirt','romper','pajamas','set'], attr:['cute','cartoon','animal print','rainbow','floral'], material:['cotton','organic cotton','bamboo fiber'] },
+    'sports': { core:['leggings','sports bra','shorts','tank top','set'], attr:['high waist','seamless','quick dry','breathable'], material:['nylon','spandex','polyester'], activity:['yoga','running','gym','hiking'] },
+    'shoes': { core:['sneakers','heels','sandals','boots','flats'], attr:['chunky','platform','pointed toe','strappy'], material:['leather','pu leather','canvas','rubber'], occasion:['casual','sports','party','office'] },
+    'men-clothing': { core:['shirt','t-shirt','hoodie','jacket','pants'], attr:['solid','striped','graphic','vintage'], fit:['regular fit','slim fit','oversized','relaxed fit'], material:['cotton','polyester','denim','fleece'], occasion:['casual','streetwear','sports','work'] },
+  };
+  const styleAdj = {
+    casual:['Casual','Daily','Relaxed','Comfy'], elegant:['Elegant','Chic','Sophisticated','Classy'],
+    street:['Streetwear','Edgy','Urban','Trendy'], vintage:['Vintage','Retro','Classic','Timeless'],
+    minimalist:['Minimalist','Basic','Essential','Clean'], sexy:['Sexy','Hot','Slim Fit','Bodycon'],
+    boho:['Bohemian','Boho','Free-spirited','Festival'], korean:['Korean Style','K-fashion','Cute','Sweet'],
+    y2k:['Y2K','2000s','Throwback','Aesthetic'],
+  };
+
+  function g(id) { return Util.q(id).value.trim(); }
+
+  function getKB() { return kwDB[g('l_category')] || kwDB['women-clothing']; }
+
+  function getInputs() {
+    const f = g('l_features'); const s = g('l_scene');
+    const sa = styleAdj[g('l_style')] || styleAdj['casual'];
+    return {
+      category: g('l_category'), style: g('l_style'),
+      productName: g('l_productName') || 'Fashion Item',
+      material: g('l_material') || 'high quality fabric',
+      features: f ? f.split(/[,，]/).map(x => x.trim()).filter(Boolean) : ['Trendy design', 'Comfortable fit'],
+      scene: s || 'daily casual',
+      styleName: sa[0],
+      styleWords: sa,
+    };
+  }
+
+  function generateTitles() {
+    const p = getInputs(); const kb = getKB();
+    const core = p.productName || kb.core[0];
+    const a = kb.attr.slice(0,4); const f = kb.fit.slice(0,3);
+    const occs = p.scene.split(/[,，]/).map(x => x.trim()).filter(Boolean);
+
+    const tA = [p.styleWords[0], core, a[0], f[0], occs[0]||'casual', p.material.split(/[,，]/)[0].trim(), a[1]||'', p.features[0]||''].filter(Boolean).join(' ');
+    Util.q('l_titleA').textContent = tA;
+
+    const tB = [p.styleWords[1]||p.styleWords[0], core, '|', p.features.slice(0,2).join(' & '), '|', occs[0]||'daily wear'].filter(Boolean).join(' ');
+    Util.q('l_titleB').textContent = tB;
+
+    const tC = [p.styleWords[0], core, p.features[0]||''].filter(Boolean).join(' · ');
+    Util.q('l_titleC').textContent = tC;
+
+    const len = tA.length;
+    let s='C', cl='score-c';
+    if (len>=40 && len<=120) { s='A'; cl='score-a'; }
+    else if (len>=25 || len<=150) { s='B'; cl='score-b'; }
+    Util.q('l_score').innerHTML = `<span class="${cl}">${s}</span> (${len}字符)`;
+  }
+
+  function generateDesc() {
+    const p = getInputs();
+    const en = `✨ ${p.productName} - Your New Wardrobe Essential!\n\n🌟 Features:\n• Stylish ${p.styleName} design perfect for ${p.scene}\n• Made from comfortable ${p.material}\n• ${p.features.map(x => x.charAt(0).toUpperCase()+x.slice(1)).join(' · ')}\n\n📐 Size Guide: Please check size chart in product images\n\n🎀 Perfect for:\n${p.scene.split(',').map(s => '• ' + s.trim()).join('\n')}\n\n💝 Trendy design at an affordable price!`;
+    Util.q('l_descEN').textContent = en;
+  }
+
+  function generateKW() {
+    const p = getInputs(); const kb = getKB();
+    const hf = [...new Set([p.productName, ...kb.core.slice(0,3), ...p.styleWords.slice(0,2), ...kb.fit.slice(0,2), ...kb.attr.slice(0,2), ...kb.occasion.slice(0,2), ...(kb.season||[]), p.material.split(/[,，]/)[0].trim(), ...(kb.neckline||[]), ...(kb.sleeve||[])])].filter(Boolean).slice(0,25);
+    Util.q('l_kw').innerHTML = hf.map(k => `<span class="tag" style="background:rgba(255,77,166,0.12);color:var(--accent2);">${k}</span>`).join(' ');
+
+    const lt = [
+      `${p.styleWords[0]} ${p.productName} for ${p.scene.split(',')[0].trim()}`,
+      `affordable ${p.material.split(',')[0].trim()} ${p.productName}`,
+      `${p.features[0]||'trendy'} ${p.productName} ${kb.fit[0]||''}`.trim(),
+      `${p.productName} ${p.scene.split(',')[0].trim()} outfit`,
+      `best ${p.productName} for ${p.scene.split(',')[0].trim()}`,
+    ].filter(l => l.length > 10);
+    Util.q('l_longtail').innerHTML = lt.map(k => `<span class="tag" style="background:rgba(0,212,170,0.12);color:var(--accent);">${k}</span>`).join(' ');
+  }
+
+  function generateAll() { generateTitles(); generateDesc(); generateKW(); }
+  generateAll();
+  return { generateAll, generateTitles, generateDesc, generateKW };
+})();
+
+// ==========================================
+// 面板3: 数据分析器
+// ==========================================
+const Data = (() => {
+  const DEMO = `日期,产品名称,销量,单价($),成本(¥),广告费(¥),运费(¥)\n2025-05-01,碎花连衣裙,3,12.99,30,15,9\n2025-05-01,简约T恤,5,8.99,12,10,6\n2025-05-02,碎花连衣裙,2,12.99,30,10,6\n2025-05-02,高腰牛仔裤,1,19.99,55,8,12\n2025-05-03,碎花连衣裙,4,12.99,30,20,12\n2025-05-03,简约T恤,3,8.99,12,12,9\n2025-05-03,珍珠项链,6,5.99,8,18,6\n2025-05-04,高腰牛仔裤,3,19.99,55,12,18\n2025-05-04,珍珠项链,8,5.99,8,24,8\n2025-05-04,碎花连衣裙,5,12.99,30,25,15\n2025-05-05,简约T恤,7,8.99,12,21,12\n2025-05-05,珍珠项链,4,5.99,8,16,4\n2025-05-05,高腰牛仔裤,2,19.99,55,10,8\n2025-05-06,碎花连衣裙,6,12.99,30,30,18\n2025-05-06,简约T恤,4,8.99,12,12,8\n2025-05-07,高腰牛仔裤,5,19.99,55,20,15\n2025-05-07,珍珠项链,7,5.99,8,21,7`;
+
+  function switchInput(type) {
+    ['d_tabPaste','d_tabUpload','d_tabDemo'].forEach(id => Util.q(id).classList.remove('active'));
+    Util.q('d_tab' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+    Util.q('d_paste').style.display = type === 'paste' ? 'block' : 'none';
+    Util.q('d_upload').style.display = type === 'upload' ? 'block' : 'none';
+    if (type === 'demo') Util.q('d_csv').value = DEMO;
+  }
+
+  function parseCSV(text) {
+    const lines = text.trim().split('\n').filter(l => l.trim());
+    if (lines.length < 2) return null;
+    const headers = lines[0].split(',').map(h => h.trim());
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const vals = lines[i].split(',').map(v => v.trim());
+      if (vals.length < headers.length) continue;
+      const row = {}; headers.forEach((h, j) => row[h] = vals[j]); rows.push(row);
+    }
+    return { headers, rows };
+  }
+
+  function mapCol(row, candidates) {
+    for (const c of candidates) if (row[c] !== undefined) return row[c];
+    return null;
+  }
+
+  function analyze() {
+    const text = Util.q('d_csv').value.trim();
+    if (!text) { alert('请先粘贴CSV数据或加载演示数据'); return; }
+    const parsed = parseCSV(text);
+    if (!parsed) { alert('CSV格式错误'); return; }
+
+    const er = parseFloat(Util.q('d_exchangeRate').value) || 7.25;
+    const cr = parseFloat(Util.q('d_commissionRate').value) / 100 || 0.12;
+
+    const rows = parsed.rows.map(r => {
+      const date = mapCol(r, ['日期','date','Date','订单日期']);
+      const product = mapCol(r, ['产品名称','产品','product','Product Name','商品名称','名称']);
+      const qty = parseFloat(mapCol(r, ['销量','数量','quantity','Qty','qty'])) || 0;
+      const usd = parseFloat(mapCol(r, ['单价($)','单价','price','Price','售价'])) || 0;
+      const cost = parseFloat(mapCol(r, ['成本(¥)','成本','cost','采购成本'])) || 0;
+      const ad = parseFloat(mapCol(r, ['广告费(¥)','广告费','ad cost','广告'])) || 0;
+      const ship = parseFloat(mapCol(r, ['运费(¥)','运费','shipping','物流费'])) || 0;
+      const rev = qty * usd * er;
+      const comm = rev * cr;
+      const tc = qty * cost + ad + qty * ship + comm;
+      return { date, product, qty, usd, rev, cost:qty*cost, ad, ship:qty*ship, comm, tc, profit:rev-tc };
+    });
+
+    const pMap = {};
+    rows.forEach(r => {
+      const k = r.product || '未知';
+      if (!pMap[k]) pMap[k] = { product:k, qty:0, rev:0, cost:0, profit:0 };
+      pMap[k].qty += r.qty; pMap[k].rev += r.rev; pMap[k].cost += r.tc; pMap[k].profit += r.profit;
+    });
+    const products = Object.values(pMap).map(p => ({ ...p, margin: p.rev>0?(p.profit/p.rev*100):0 })).sort((a,b) => b.profit-a.profit);
+
+    const dMap = {};
+    rows.forEach(r => {
+      const d = r.date || '未知';
+      if (!dMap[d]) dMap[d] = { date:d, orders:0, rev:0, profit:0, cum:0 };
+      dMap[d].orders += r.qty; dMap[d].rev += r.rev; dMap[d].profit += r.profit;
+    });
+    const dates = Object.values(dMap).sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    let cum = 0; dates.forEach(d => { cum += d.profit; d.cum = cum; });
+
+    const totalRev = rows.reduce((s,r) => s+r.rev, 0);
+    const totalProfit = rows.reduce((s,r) => s+r.profit, 0);
+    const totalQty = rows.reduce((s,r) => s+r.qty, 0);
+    const uDays = new Set(rows.map(r => r.date)).size || 1;
+    const avgD = totalProfit / uDays;
+    const margin = totalRev > 0 ? (totalProfit / totalRev * 100) : 0;
+    const prog = totalProfit / 30000 * 100;
+
+    Util.q('d_kpiCard').style.display = 'block';
+    Util.q('d_revenue').textContent = '¥' + totalRev.toFixed(0);
+    Util.q('d_orders').textContent = totalQty + ' 件';
+    Util.q('d_profit').textContent = '¥' + totalProfit.toFixed(0);
+    Util.q('d_profitRate').textContent = '利润率 ' + margin.toFixed(1) + '%';
+    Util.q('d_avgDaily').textContent = '¥' + avgD.toFixed(0);
+    Util.q('d_days').textContent = uDays + ' 天数据';
+    Util.q('d_target').textContent = prog.toFixed(1) + '%';
+    Util.q('d_remain').textContent = totalProfit >= 30000 ? '✅ 已达标！' : '还差 ¥' + (30000 - totalProfit).toFixed(0);
+
+    const maxP = products.length > 0 ? products[0].profit : 1;
+    Util.q('d_productCard').style.display = 'block';
+    Util.q('d_productBody').innerHTML = products.map(p => {
+      const pct = totalProfit > 0 ? (p.profit/totalProfit*100) : 0;
+      return `<tr><td>${Util.esc(p.product)}</td><td>${p.qty}</td><td>$${(p.qty>0?(p.rev/p.qty/er):0).toFixed(2)}</td><td>¥${p.rev.toFixed(0)}</td><td>¥${p.cost.toFixed(0)}</td><td class="${p.profit>0?'profit-positive':'profit-negative'}">¥${p.profit.toFixed(0)}</td><td class="${p.margin>15?'profit-positive':p.margin>5?'profit-neutral':'profit-negative'}">${p.margin.toFixed(1)}%</td><td style="min-width:80px;">${pct.toFixed(0)}%<div class="bar-wrap"><div class="bar-fill" style="width:${(p.profit/maxP*100)}%"></div></div></td></tr>`;
+    }).join('');
+
+    Util.q('d_trendCard').style.display = 'block';
+    Util.q('d_trendBody').innerHTML = dates.map(d => {
+      const icon = d.profit > avgD ? '📈' : d.profit > 0 ? '➡️' : '📉';
+      return `<tr><td>${d.date}</td><td>${d.orders}</td><td>¥${d.rev.toFixed(0)}</td><td class="${d.profit>0?'profit-positive':'profit-negative'}">¥${d.profit.toFixed(0)}</td><td>¥${d.cum.toFixed(0)}</td><td>${icon}</td></tr>`;
+    }).join('');
+
+    Util.q('d_tipsCard').style.display = 'block';
+    const best = products[0], worst = products[products.length-1];
+    let tips = [];
+    if (best && best.profit > 0) tips.push(`🔥 <strong>${Util.esc(best.product)}</strong> 最赚钱（¥${best.profit.toFixed(0)}），加大投入。`);
+    if (worst && worst.profit < 0) tips.push(`⚠️ <strong>${Util.esc(worst.product)}</strong> 在亏损，考虑优化或下架。`);
+    tips.push(margin < 10 ? `📌 利润率 ${margin.toFixed(1)}% 偏低，需提价或降成本。` : `✅ 利润率 ${margin.toFixed(1)}% 健康，放大赚钱的品。`);
+    if (avgD > 0) tips.push(`🎯 日均¥${avgD.toFixed(0)}，约需 ${Math.ceil((30000-totalProfit)/avgD)} 天达标。`);
+    Util.q('d_tipsContent').innerHTML = tips.map(t => `<p style="margin:6px 0;">${t}</p>`).join('');
+    Util.q('d_kpiCard').scrollIntoView({ behavior:'smooth' });
+  }
+
+  // File upload
+  Util.q('d_file').addEventListener('change', function(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) { Util.q('d_csv').value = ev.target.result; switchInput('paste'); };
+    reader.readAsText(file);
+  });
+
+  return { switchInput, analyze };
+})();
+
+// ==========================================
+// 面板4: 竞品监控
+// ==========================================
+const Competitor = (() => {
+  const KEY = 'shein-competitors-v2';
+
+  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { return []; } }
+  function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+
+  function add() {
+    const name = Util.q('cmp_name').value.trim();
+    const price = parseFloat(Util.q('cmp_price').value);
+    const sales = parseInt(Util.q('cmp_sales').value) || 0;
+    const my = Util.q('cmp_myProduct').value.trim();
+    if (!name || isNaN(price) || price <= 0) { alert('请填写名称和有效价格'); return; }
+    const data = load();
+    const today = new Date().toISOString().split('T')[0];
+    data.push({ id:Date.now(), name, myProduct:my, estimatedSales:sales, priceHistory:[{ date:today, price }], currentPrice:price, addedDate:today });
+    save(data);
+    Util.q('cmp_name').value = ''; Util.q('cmp_price').value = ''; Util.q('cmp_sales').value = ''; Util.q('cmp_myProduct').value = '';
+    render();
+  }
+
+  function remove(id) { save(load().filter(c => c.id !== id)); render(); }
+
+  function clearAll() { if (confirm('清空所有竞品数据？')) { save([]); render(); } }
+
+  function batchUpdate() {
+    const data = load(); const today = new Date().toISOString().split('T')[0];
+    let changed = 0;
+    data.forEach(c => {
+      const inp = Util.q('cmp_upd_' + c.id);
+      if (inp) { const np = parseFloat(inp.value); if (!isNaN(np) && np > 0 && np !== c.currentPrice) { c.priceHistory.push({ date:today, price:np }); c.currentPrice = np; changed++; } }
+    });
+    if (changed > 0) { save(data); render(); }
+  }
+
+  function pChange(h) {
+    if (h.length < 2) return ['price-same', '—'];
+    const l = h[h.length-1].price, p = h[h.length-2].price;
+    if (l > p) return ['price-up', '↑ +$' + (l-p).toFixed(2)];
+    if (l < p) return ['price-down', '↓ -$' + Math.abs(l-p).toFixed(2)];
+    return ['price-same', '→ 不变'];
+  }
+
+  function render() {
+    const data = load();
+
+    // Update card
+    if (data.length === 0) { Util.q('cmp_updateCard').style.display = 'none'; }
+    else {
+      Util.q('cmp_updateCard').style.display = 'block';
+      Util.q('cmp_updateList').innerHTML = data.map(c => `
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;">
+          <span style="flex:1;">${Util.esc(c.name)}</span>
+          <span style="color:var(--text-secondary);font-size:12px;">上次: $${c.currentPrice.toFixed(2)}</span>
+          <span>→</span>
+          <input type="number" id="cmp_upd_${c.id}" value="${c.currentPrice.toFixed(2)}" step="0.01"
+            style="width:100px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:14px;font-family:inherit;">
+        </div>`).join('');
+    }
+
+    // Table
+    const tbl = Util.q('cmp_table');
+    if (data.length === 0) { tbl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary);">🔍 还没有竞品数据，在上方添加</div>'; return; }
+
+    tbl.innerHTML = `<table><thead><tr><th>竞品</th><th>对标品</th><th>当前$</th><th>变动</th><th>历史</th><th>日销</th><th></th></tr></thead><tbody>${data.map(c => {
+      const [cls, sym] = pChange(c.priceHistory);
+      const hist = c.priceHistory.map(h => `$${h.price.toFixed(2)}(${h.date.slice(5)})`).join(' → ');
+      const tag = c.priceHistory.length >= 3 ? '<span class="tag" style="background:rgba(255,77,106,0.12);color:var(--danger);">监控中</span>' : '<span class="tag" style="background:rgba(0,212,170,0.12);color:var(--accent);">新添加</span>';
+      return `<tr><td>${Util.esc(c.name)} ${tag}</td><td>${Util.esc(c.myProduct)||'—'}</td><td><strong>$${c.currentPrice.toFixed(2)}</strong></td><td class="${cls}">${sym}</td><td style="font-size:12px;color:var(--text-secondary);">${hist}</td><td>${c.estimatedSales||'—'}</td><td><button class="btn-danger" onclick="Competitor.remove(${c.id})">删</button></td></tr>`;
+    }).join('')}</tbody></table>`;
+  }
+
+  render();
+  return { add, remove, clearAll, batchUpdate, render };
+})();
+
+// Initial tab
+Util.q('tabBar').querySelector('[data-panel="calc"]').classList.add('active');
+</script>
+</body>
+</html>
